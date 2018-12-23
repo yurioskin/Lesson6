@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="avatar_size">100dp</dimen>
+    <dimen name="list_view_item_margin_8dp">8dp</dimen>
+    <dimen name="list_view_text_size_20sp">20sp</dimen>
+    <dimen name="second_fragment_frame_margin">16dp</dimen>
+    <dimen name="second_fragment_frame_height">16dp</dimen>
+</resources>
