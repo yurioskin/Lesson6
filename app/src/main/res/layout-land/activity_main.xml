@@ -8,20 +8,26 @@
     android:orientation="horizontal"
     tools:context=".MainActivity">
 
-    <FrameLayout
-        android:id="@+id/first_frame"
+    <fragment
+        android:id="@+id/first_fragment"
+        android:name="com.example.oskin.lesson6.FirstFragment"
         android:layout_weight="1"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_gravity="center_vertical"
+        tools:layout="@layout/fragment_first">
 
-    </FrameLayout>
+    </fragment>
 
-    <FrameLayout
-        android:id="@+id/second_frame"
+    <fragment
+        android:id="@+id/second_fragment"
+        android:name="com.example.oskin.lesson6.SecondFragment"
         android:layout_weight="1"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        tools:layout="@layout/fragment_second">
 
-    </FrameLayout>
+    </fragment>
 
 </LinearLayout>

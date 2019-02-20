@@ -2,25 +2,23 @@ package com.example.oskin.lesson6;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 public class SecondFragment extends Fragment {
 
     private Button mButton;
-    IActivityCallback mCallback;
+    private IActivityCallback<String> mCallback;
+    private IFragmentCallback<String> mFirstFragmentCallback;
 
     private boolean hasChild = false;
-
-
-    public SecondFragment() {
-        // Required empty public constructor
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -40,9 +38,8 @@ public class SecondFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_second, container, false);
         mButton = view.findViewById(R.id.button_second_fragment);
         return view;
@@ -58,8 +55,9 @@ public class SecondFragment extends Fragment {
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment f = getChildFragmentManager().findFragmentById(R.id.child_fragment);
-                if (!(f instanceof ThirdFragment)){
+                ThirdFragment f = (ThirdFragment) getChildFragmentManager()
+                        .findFragmentById(R.id.child_fragment);
+                if (f == null){
                     addInnerFragment();
                 }
                     setDataInFragment();
@@ -68,11 +66,8 @@ public class SecondFragment extends Fragment {
     }
 
     private void setDataInFragment(){
-        String data = mCallback.getDataFromFirstFragment().toString();
-        FragmentManager manager = getChildFragmentManager();
-        Fragment fragment = manager.findFragmentById(R.id.child_fragment);
-        ((ThirdFragment) fragment).setData("Data from first fragment: " + data);
-        mButton.setText(data);
+        String data = mCallback.getDataCallback();
+        mFirstFragmentCallback.setDataCallback(getString(R.string.data_from_first_fragment) + data);
     }
 
     private void addInnerFragment(){
@@ -80,12 +75,14 @@ public class SecondFragment extends Fragment {
         manager.beginTransaction()
                 .add(R.id.child_fragment,ThirdFragment.newInstance())
                 .commitNow();
+        mFirstFragmentCallback = (IFragmentCallback<String>) manager.findFragmentById(R.id.child_fragment);
         hasChild = true;
     }
 
     public void onBackPressed(){
         if (!isHasChild())
             return;
+
         FragmentManager manager = getChildFragmentManager();
         Fragment fragment = manager.findFragmentById(R.id.child_fragment);
         FragmentTransaction transaction = manager.beginTransaction();

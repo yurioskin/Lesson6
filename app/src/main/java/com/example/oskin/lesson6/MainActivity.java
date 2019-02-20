@@ -4,10 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+
 import android.os.Bundle;
 
 public class MainActivity extends AppCompatActivity implements IActivityCallback {
@@ -20,6 +19,8 @@ public class MainActivity extends AppCompatActivity implements IActivityCallback
     private Boolean firstCreate = true;
     private Boolean stopService = true;
 
+    IFragmentCallback<String> mIFragmentCallback;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,17 +28,14 @@ public class MainActivity extends AppCompatActivity implements IActivityCallback
         setContentView(R.layout.activity_main);
         initBroadcast();
 
-        if (savedInstanceState != null){
-            firstCreate = savedInstanceState.getBoolean(ACTIVITY_STATE,true);
-        }
-
-        if (firstCreate){
+        if (savedInstanceState == null)
             startService(MyService.newIntent(MainActivity.this));
-            initFragment();
-            firstCreate = false;
-        }
 
+        initFragmentsCallback();
+    }
 
+    private void initFragmentsCallback() {
+        mIFragmentCallback = (IFragmentCallback<String>) getSupportFragmentManager().findFragmentById(R.id.first_fragment);
     }
 
     @Override
@@ -51,13 +49,6 @@ public class MainActivity extends AppCompatActivity implements IActivityCallback
         registerReceiver(mCustomBroadcastReceiver,mIntentFilter,null,null);
     }
 
-    private void initFragment(){
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
-        transaction.add(R.id.first_frame,FirstFragment.newInstance())
-                .add(R.id.second_frame,SecondFragment.newInstance())
-                .commitNow();
-    }
 
     private void initBroadcast(){
         mCustomBroadcastReceiver = new CustomBroadcastReceiver();
@@ -86,7 +77,9 @@ public class MainActivity extends AppCompatActivity implements IActivityCallback
 
     @Override
     public void onBackPressed() {
-        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.second_frame);
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.second_fragment);
+        if (fragment == null)
+            return;
         Boolean child = ((SecondFragment) fragment).isHasChild();
         if (child){
             ((SecondFragment) fragment).onBackPressed();
@@ -97,20 +90,16 @@ public class MainActivity extends AppCompatActivity implements IActivityCallback
     }
 
     @Override
-    public String getDataFromFirstFragment() {
-        FragmentManager manager = getSupportFragmentManager();
-        Fragment fragment = manager.findFragmentById(R.id.first_frame);
-        return ((FirstFragment) fragment).getData();
+    public String getDataCallback() {
+        return mIFragmentCallback.getDataCallback();
     }
 
     private class CustomBroadcastReceiver extends BroadcastReceiver{
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            FragmentManager manager = getSupportFragmentManager();
-            Fragment fragment = manager.findFragmentById(R.id.first_frame);
-            int i = intent.getIntExtra(MyService.NEW_STATE,0);
-            ((FirstFragment) fragment).setData(i);
+            String data = intent.getStringExtra(MyService.NEW_STATE);
+            mIFragmentCallback.setDataCallback(data);
         }
     }
 }

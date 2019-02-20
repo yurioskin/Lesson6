@@ -30,7 +30,7 @@ public class MyService extends Service {
                         return;
 
                     Intent intent = new Intent(ACTION_CHANGE_STATE);
-                    intent.putExtra(NEW_STATE, i);
+                    intent.putExtra(NEW_STATE, String.valueOf(i));
                     sendBroadcast(intent);
                     TimeUnit.SECONDS.sleep(1);
                     }
